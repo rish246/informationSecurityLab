@@ -11,33 +11,68 @@ bool isCapital(char letter){
 
 }
 string encryptCaesar(string message){
-    string encodedMessage = "";
-
+    // map letters => 0, 25 scheme
+    string mappedMessage = "";
     for(char letter : message){
-        int charToInsert = (letter + SHIFT);
-        char substituteLetter = (char) charToInsert;
-        encodedMessage += substituteLetter;
+        // handle spaces
+        if(letter != ' ')
+            mappedMessage += (char) (letter - 'a');
+        else 
+            mappedMessage += " ";
     }
 
-    return encodedMessage;
+    string encryptedMessage = "";
+    // use a shift
+    for(char mappedLetter : mappedMessage){
+        if(mappedLetter == ' '){
+            encryptedMessage += ' ';
+            continue;
+        }
+        int finalLocation = ((mappedLetter + SHIFT) % 26);
+        char encryptedLetter = finalLocation + 'a';
+        encryptedMessage += encryptedLetter;
+    }
+
+    return encryptedMessage;
+    // make final code
 }
 
 // only stay in the realm of letters
 
 string decryptCaesar(string encodedMessage){
-    string originalMessage = "";
-    for(auto letter : encodedMessage){
-        char originalLetter = (char) (letter - SHIFT);
-        // cout << originalLetter << ' ';
-        originalMessage += originalLetter;
+    // map
+    string mappedMessage = "";
+    for(char letter : encodedMessage){
+        if(letter == ' '){
+            mappedMessage += ' ';
+            continue;
+        }
+
+        mappedMessage += (letter - 'a');
     }
+    string originalMessage = "";
+    // encrypt the message
+    for(char mappedLetter : mappedMessage){
+        if(mappedLetter == ' '){
+            originalMessage += ' ';
+            continue;
+        }
+        // 0 ... 25
+        int finalShift = (mappedLetter - SHIFT) >= 0 ? (mappedLetter - SHIFT) : (26 + mappedLetter - SHIFT);
+        
+        char originalLetter = finalShift + 'a';
+        originalMessage += originalLetter;
+
+    }
+
     return originalMessage;
     
 }
 
+
 int main()
 {
-    string message = "This is a message";
+    string message = "this is a message xyztw";
 
     string encryptedText = encryptCaesar(message);
 
