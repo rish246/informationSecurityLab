@@ -1,5 +1,5 @@
-import numpy as np
 import math
+import numpy as np
 import sympy
 
 # plain_text = "attack"
@@ -10,7 +10,6 @@ class HillCipher:
     def __init__(self, key):
         self.key = key
 
-    
 
     ##################################################################################
     ########## helper functions ######################################################
@@ -19,7 +18,7 @@ class HillCipher:
         cur_col_vector = []
         
         len_cur_col_vector = 0
-        
+
         for letter in plain_text:
             cur_col_vector.append(ord(letter) - ord('a'))
             len_cur_col_vector += 1
@@ -103,26 +102,9 @@ class HillCipher:
 
         # print(original_text)
         return original_text
-    #####################################################################################
-    #####################################################################################
 
 
 
-    # global plain_text
-# key = np.array([[2, 3], [3, 6]])
-# hill_cipher = HillCipher(key)
-
-
-# encrypted_text = hill_cipher.encrypt(plain_text)
-# print(key)
-
-# print(encrypted_text)
-
-# original_text = hill_cipher.decrypt(encrypted_text)
-# print(original_text)
-
-
-# main()
 
 def main():
     key = np.array([[2, 3], [3, 6]])
@@ -141,3 +123,4 @@ def main():
 
 
 main()
+
