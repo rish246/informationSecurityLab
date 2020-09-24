@@ -1,3 +1,6 @@
+"""
+Hill Cipher Python implementation
+"""
 import math
 import numpy as np
 import sympy
@@ -14,6 +17,12 @@ class HillCipher:
     ##################################################################################
     ########## helper functions ######################################################
     def get_col_vectors(self, plain_text):
+        """
+        Convert text into column vectors
+        e.g => plaintText = "abcd"
+            => colVectors = [ ["a", "b"], ["c", "d"] ]
+            => adjascent letters go into same column vector
+        """
         list_column_vectors = []
         cur_col_vector = []
         
@@ -33,6 +42,11 @@ class HillCipher:
         return list_column_vectors
 
     def convert_col_vectors(self, list_column_vectors, key):
+        """
+        encrypt/decrypt the column vectors
+        if encrypted => decrypt
+        else encrypt
+        """
         list_converted_col_vectors = []
 
         for column_vector in list_column_vectors:
@@ -44,6 +58,10 @@ class HillCipher:
 
 
     def get_converted_text(self, list_encrypted_col_vectors):
+        """ 
+        Convert the column vectors back to string form
+        e.g => [["a", "b"], ["c", "d"]] ==> "abcd"
+        """
         converted_text = []
 
         for col_vector in list_encrypted_col_vectors:
@@ -59,6 +77,10 @@ class HillCipher:
     ##############################################################################
     ############### main encryption code #########################################
     def encrypt(self, plain_text):
+        """
+        Encrypt the recieved plain text
+
+        """
         list_column_vectors = []
 
         # key = np.array([[2, 3], [3, 6]])
@@ -77,6 +99,11 @@ class HillCipher:
     ###########################################################################
     ###################### main decryption code ##############################
     def inverse(self, matrix):
+        """
+        compute inverse of a given matrix with mod(26)
+        i.e => return inverse(matrix) mod(26)
+
+        """
         determinant = int(np.linalg.det(matrix))
 
         determinant_inv = int(sympy.invert(determinant, 26))
@@ -91,6 +118,9 @@ class HillCipher:
 
 
     def decrypt(self, encrypted_text):
+        """
+        decrypt the recieved encrypted text
+        """
         key_inverse = self.inverse(self.key)
 
         # print(key_inverse)
@@ -107,6 +137,10 @@ class HillCipher:
 
 
 def main():
+    """ 
+    Main function
+
+    """
     key = np.array([[2, 3], [3, 6]])
 
     hill_cipher = HillCipher(key)
