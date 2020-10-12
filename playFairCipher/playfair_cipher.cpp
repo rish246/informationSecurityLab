@@ -110,6 +110,40 @@ string encrypt(string plainText)
 
     return cipherText;
 }
+
+string decrypt(string cipherText)
+{
+    string originalPlainText = "";
+    for (int i = 0; i < cipherText.size() - 1; i += 2)
+    {
+        char firstChar = cipherText[i], secondChar = cipherText[i + 1];
+
+        pair<int, int> locFirstChar = location[firstChar];
+        pair<int, int> locSecondChar = location[secondChar];
+
+        int rowFirstChar = locFirstChar.first, colFirstChar = locFirstChar.second;
+        int rowSecondChar = locSecondChar.first, colSecondChar = locSecondChar.second;
+
+        if (rowFirstChar == rowSecondChar)
+        {
+            originalPlainText += Matrix[rowFirstChar][(colFirstChar - 1) % 5];
+            originalPlainText += Matrix[rowFirstChar][(colSecondChar - 1) % 5];
+        }
+        else if (colFirstChar == colSecondChar)
+        {
+            originalPlainText += Matrix[(rowFirstChar - 1) % 5][colFirstChar];
+            originalPlainText += Matrix[(rowSecondChar - 1) % 5][colSecondChar];
+        }
+        else
+        {
+            originalPlainText += Matrix[rowFirstChar][colSecondChar];
+            originalPlainText += Matrix[rowSecondChar][colFirstChar];
+        }
+    }
+
+    return originalPlainText;
+}
+
 void printMatrix()
 {
     for (Row r : Matrix)
@@ -148,5 +182,7 @@ int main()
     // srszszderspdkcnx
     // cloooouclcaeoolc
 
+    string originalPlainText = decrypt(cipherText);
+    cout << originalPlainText << endl;
     printMatrix();
 }
