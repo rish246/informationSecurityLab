@@ -126,13 +126,17 @@ string decrypt(string cipherText)
 
         if (rowFirstChar == rowSecondChar)
         {
-            originalPlainText += Matrix[rowFirstChar][(colFirstChar - 1) % 5];
-            originalPlainText += Matrix[rowFirstChar][(colSecondChar - 1) % 5];
+            int colOne = colFirstChar == 0 ? 4 : colFirstChar - 1;
+            int colTwo = colSecondChar == 0 ? 4 : colSecondChar - 1;
+            originalPlainText += Matrix[rowFirstChar][colOne];
+            originalPlainText += Matrix[rowFirstChar][colTwo];
         }
         else if (colFirstChar == colSecondChar)
         {
-            originalPlainText += Matrix[(rowFirstChar - 1) % 5][colFirstChar];
-            originalPlainText += Matrix[(rowSecondChar - 1) % 5][colSecondChar];
+            int rowOne = (rowFirstChar == 0) ? 4 : rowFirstChar - 1;
+            int rowTwo = (rowSecondChar == 0) ? 4 : rowSecondChar - 1;
+            originalPlainText += Matrix[rowOne][colFirstChar];
+            originalPlainText += Matrix[rowTwo][colSecondChar];
         }
         else
         {
