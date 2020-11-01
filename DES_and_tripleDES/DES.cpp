@@ -9,11 +9,8 @@
 #include <unordered_map>
 
 using namespace std;
-
-#define uint28_t bitset<28>
 #define MOD_ENCRYPT 0
 #define MOD_DECRYPT 1
-
 int p_box_perm[32] = {16, 7, 20, 21,
                       29, 12, 28, 17,
                       1, 15, 23, 26,
@@ -133,21 +130,21 @@ string apply_s_box_perm(string input)
 
     string output = "";
 
-    for (int n_group = 0; n_group < 8; n_group++)
+    for (int i_group = 0; i_group < 8; i_group++)
     {
         string cur_group_op = "";
-        int start_idx = n_group * 6;
+        int start_idx = i_group * 6;
 
         string cur_str = input.substr(start_idx, 6);
 
         int s_table_row = (cur_str[0] - '0') * 2 + (cur_str[5] - '0');
         int s_table_col = bitset<4>(cur_str.substr(1, 4)).to_ulong();
 
-        cur_group_op += bitset<4>(s_box_perm[n_group][s_table_row][s_table_col]).to_string();
+        cur_group_op += bitset<4>(s_box_perm[i_group][s_table_row][s_table_col]).to_string();
 
         output += cur_group_op;
 
-        // cout << n_group << " --> " << cur_str << " " << cur_group_op << endl;
+        // cout << i_group << " --> " << cur_str << " " << cur_group_op << endl;
     }
 
     return output;
@@ -204,91 +201,6 @@ int final_perm[64] = {40, 8, 48, 16, 56, 24, 64, 32,
                       34, 2, 42, 10, 50, 18, 58, 26,
                       33, 1, 41, 9, 49, 17, 57, 25};
 
-// keys will be same for each block
-/*
-    CODE FOR ENCRYPTION
-*/
-string encrypt_block(bitset<64> data_bts, vector<string> compressed_keys)
-{
-    // bitset<64> data_bts(data);
-    // apply initial perm on data
-    string data_block = apply_perm(initial_perm, data_bts.to_string(), 64);
-
-    string l_data = data_block.substr(0, 32);
-    string r_data = data_block.substr(32, 32);
-
-    for (int i_round = 0; i_round < 16; i_round++)
-    {
-        // L_shift
-        // compression
-        string compressed_key = compressed_keys[i_round];
-
-        string r_data_copy = r_data;
-
-        // data operations start
-        string r_data_exp = apply_perm(exp_perm, r_data, 48);
-
-        r_data_exp = (bitset<48>(r_data_exp) ^ bitset<48>(compressed_key)).to_string();
-
-        string r_data_s_box = apply_s_box_perm(r_data_exp);
-
-        string r_data_p_box = apply_perm(p_box_perm, r_data_s_box, 32);
-
-        r_data_p_box = (bitset<32>(r_data_p_box) ^ bitset<32>(l_data)).to_string();
-
-        if (i_round != 15)
-        {
-            r_data = r_data_p_box;
-
-            l_data = r_data_copy;
-        }
-        else
-        {
-            l_data = r_data_p_box;
-        }
-        cout << "Round " << (i_round + 1) << " " << bin_to_hex(l_data) << " " << bin_to_hex(r_data) << " " << bin_to_hex(compressed_key) << endl;
-    }
-
-    // apply final permute
-    string cipher_block = apply_perm(final_perm, (l_data + r_data), 64);
-
-    return bin_to_hex(cipher_block);
-}
-
-string encrypt(string data, vector<string> &compressed_keys)
-{
-    string data_bin = hex_to_bin(data);
-
-    int size_block = 16;
-
-    int total_blocks = (data.size() / size_block);
-
-    string cipher_text = "";
-
-    for (int n_block = 0; n_block < total_blocks; n_block++)
-    {
-        int starting_idx = n_block * size_block;
-
-        string cur_block = data_bin.substr(starting_idx, size_block * 4);
-
-        // cout << cur_block << endl;
-
-        // encrypt cur block
-        string res = encrypt_block(bitset<64>(cur_block), compressed_keys);
-
-        cipher_text += res;
-    }
-
-    return cipher_text;
-}
-
-string decrypt(const string &data, vector<string> compressed_keys)
-{
-    reverse(compressed_keys.begin(), compressed_keys.end());
-
-    return encrypt(data, compressed_keys);
-}
-
 /*********************************************
  * 
  * CODE FOR PREPARING KEYS (K1 -> K16)
@@ -337,22 +249,145 @@ vector<string> prepare_compressed_keys(const string &key)
     return compressed_keys;
 }
 
+// keys will be same for each block
+/*
+    CODE FOR ENCRYPTION
+*/
+string encrypt_block(bitset<64> data_bts, vector<string> compressed_keys)
+{
+    // bitset<64> data_bts(data);
+    // apply initial perm on data
+    string data_block = apply_perm(initial_perm, data_bts.to_string(), 64);
+
+    string l_data = data_block.substr(0, 32);
+    string r_data = data_block.substr(32, 32);
+
+    for (int i_round = 0; i_round < 16; i_round++)
+    {
+        string compressed_key = compressed_keys[i_round];
+
+        string r_data_copy = r_data;
+
+        // data operations start
+        string r_data_exp = apply_perm(exp_perm, r_data, 48);
+
+        r_data_exp = (bitset<48>(r_data_exp) ^ bitset<48>(compressed_key)).to_string();
+
+        string r_data_s_box = apply_s_box_perm(r_data_exp);
+
+        string r_data_p_box = apply_perm(p_box_perm, r_data_s_box, 32);
+
+        r_data_p_box = (bitset<32>(r_data_p_box) ^ bitset<32>(l_data)).to_string();
+
+        if (i_round != 15)
+        {
+            r_data = r_data_p_box;
+
+            l_data = r_data_copy;
+        }
+        else
+        {
+            l_data = r_data_p_box;
+        }
+        // cout << "Round " << (i_round + 1) << " " << bin_to_hex(l_data) << " " << bin_to_hex(r_data) << " " << bin_to_hex(compressed_key) << endl;
+    }
+
+    // apply final permute
+    string cipher_block = apply_perm(final_perm, (l_data + r_data), 64);
+
+    return bin_to_hex(cipher_block);
+}
+
+string encrypt(string data, string key_bin, int mode = MOD_ENCRYPT)
+{
+    vector<string> compressed_keys = prepare_compressed_keys(key_bin);
+
+    if (mode == MOD_DECRYPT)
+    {
+        reverse(compressed_keys.begin(), compressed_keys.end());
+    }
+
+    string data_bin = hex_to_bin(data);
+
+    int size_block = 16;
+
+    int n_blocks = (data.size() / size_block);
+
+    string cipher_text = "";
+
+    for (int i_block = 0; i_block < n_blocks; i_block++)
+    {
+        int starting_idx = i_block * size_block;
+
+        string cur_block = data_bin.substr(starting_idx, size_block * 4);
+
+        string res = encrypt_block(bitset<64>(cur_block), compressed_keys);
+
+        cipher_text += res;
+    }
+
+    return cipher_text;
+}
+
+string decrypt(const string &data, string key_bin)
+{
+    return encrypt(data, key_bin, MOD_DECRYPT);
+}
 ///////////////////////////////////////////////////////////////////////////////
+/*
+TRIPLE DES ==> EK3(Dk2(Ek1(plaintext)))
+decryption ==> Dk1(Ek2(Dk3(plaintext)))
+*/
+
+void DES_Algo(string data)
+{
+    cout << "......................................................................." << endl;
+    cout << "<<<<<<<<<<<<<<<<<<<<   TRIPLE DES ALGORITHM  >>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+
+    // string data = "123456ABCD132536";
+    string key1 = "AABB09182736CCDD";
+    string key1_bin = hex_to_bin(key1);
+
+    string cipher_text = encrypt(data, key1_bin);
+
+    cout << "Cipher text (DES Algorithm) : " << cipher_text << endl;
+
+    string original_text = decrypt(cipher_text, key1_bin);
+
+    cout << "Original text (DES Algorithm) : " << original_text << endl;
+    cout << "......................................................................." << endl;
+}
+
+void Triple_DES_Algo(string data)
+{
+
+    cout << "......................................................................." << endl;
+    cout << "<<<<<<<<<<<<<<<<<<<<   TRIPLE DES ALGORITHM  >>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+    string key1 = "AABB09182736CCDD";
+    string key2 = "BABB000907667863";
+    string key3 = "737374939AAAAAEE";
+
+    string key1_bin = hex_to_bin(key1);
+    string key2_bin = hex_to_bin(key2);
+    string key3_bin = hex_to_bin(key3);
+
+    string cipher_text = encrypt(decrypt(encrypt(data, key1_bin), key2_bin), key3_bin);
+    cout << "Cipher text = " << cipher_text << endl;
+
+    string original_text = decrypt(encrypt(decrypt(cipher_text, key3_bin), key2_bin), key1_bin);
+
+    cout << "Original Text = " << original_text << endl;
+    cout << "......................................................................." << endl;
+}
 int main()
 {
     // key same
-    string key = "AABB09182736CCDD";
 
     string data = "123456ABCD132536";
 
-    string key_bin = hex_to_bin(key);
+    cout << "Original Data  : " << data << endl;
 
-    vector<string> compressed_keys = prepare_compressed_keys(key_bin);
+    DES_Algo(data);
 
-    string cipher_text = encrypt(data, compressed_keys);
-    cout << "Cipher text = " << cipher_text << endl;
-
-    string original_text = decrypt(cipher_text, compressed_keys);
-
-    cout << "Original Text = " << original_text << endl;
+    Triple_DES_Algo(data);
 }
