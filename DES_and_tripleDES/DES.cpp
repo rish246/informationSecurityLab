@@ -51,7 +51,7 @@ string bin_to_hex(string s)
     mp["1110"] = "E";
     mp["1111"] = "F";
     string hex = "";
-    for (int i = 0; i < s.length(); i += 4)
+    for (int i = 0; i < (int)s.length(); i += 4)
     {
         string ch = "";
         ch += s[i];
@@ -83,7 +83,7 @@ string hex_to_bin(string hex_str)
     mp['E'] = "1110";
     mp['F'] = "1111";
     string bin = "";
-    for (int i = 0; i < hex_str.size(); i++)
+    for (int i = 0; i < (int)hex_str.size(); i++)
     {
         bin += mp[hex_str[i]];
     }
@@ -298,7 +298,7 @@ string encrypt_block(bitset<64> data_bts, vector<string> compressed_keys)
     return bin_to_hex(cipher_block);
 }
 
-string encrypt(string data, string key_bin, int mode = MOD_ENCRYPT)
+string encrypt(string data, const string &key_bin, int mode = MOD_ENCRYPT)
 {
     vector<string> compressed_keys = prepare_compressed_keys(key_bin);
 
@@ -329,7 +329,7 @@ string encrypt(string data, string key_bin, int mode = MOD_ENCRYPT)
     return cipher_text;
 }
 
-string decrypt(const string &data, string key_bin)
+string decrypt(const string &data, const string &key_bin)
 {
     return encrypt(data, key_bin, MOD_DECRYPT);
 }
@@ -339,7 +339,7 @@ TRIPLE DES ==> EK3(Dk2(Ek1(plaintext)))
 decryption ==> Dk1(Ek2(Dk3(plaintext)))
 */
 
-void DES_Algo(string data)
+void DES_Algo(const string &data)
 {
     cout << "......................................................................." << endl;
     cout << "<<<<<<<<<<<<<<<<<<<<   TRIPLE DES ALGORITHM  >>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
@@ -358,7 +358,7 @@ void DES_Algo(string data)
     cout << "......................................................................." << endl;
 }
 
-void Triple_DES_Algo(string data)
+void Triple_DES_Algo(const string &data)
 {
 
     cout << "......................................................................." << endl;
