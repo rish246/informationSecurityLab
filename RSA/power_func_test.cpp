@@ -38,20 +38,10 @@ int main()
 {
     int base, power, mod;
 
-    while (true)
-    {
-        base = rand() % 20;
-        power = rand() % 50;
-        mod = rand() % 40;
+    base = 10098;
+    power = 999999999;
+    mod = 875;
 
-        int res1 = pow_naive(base, power, mod);
-
-        int res2 = pow_better(base, power, mod);
-
-        if (res1 == res2)
-            cout << "YES" << endl;
-
-        else
-            break;
-    }
+    int res = pow_naive(base, power, mod);
+    cout << res << endl;
 }
