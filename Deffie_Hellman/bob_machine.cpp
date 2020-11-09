@@ -9,12 +9,17 @@
 
 using namespace std;
 
+/* prime numbers residing in public space */
 #define n 997
 #define g 7
 
 const int PORT = 5400;
 
-uint64_t calc_mod(uint64_t base, uint64_t power, uint64_t mod)
+/*
+    @params -> base, power, modulo
+    @return -> (base ^ power) % modulo
+*/
+uint64_t pow_mod(uint64_t base, uint64_t power, uint64_t mod)
 {
     if (power == 0)
         return 1;
@@ -24,7 +29,7 @@ uint64_t calc_mod(uint64_t base, uint64_t power, uint64_t mod)
 
     int mid = (power / 2);
 
-    int res = calc_mod(base, mid, mod);
+    int res = pow_mod(base, mid, mod);
 
     res = (res * res) % mod;
 
@@ -34,11 +39,16 @@ uint64_t calc_mod(uint64_t base, uint64_t power, uint64_t mod)
     return (res);
 }
 
+/*
+    @params -> client_socket
+    @return -> void
+    @description -> different users share their intermediate secret with each other(X and Y in our case)
+*/
 void exchange_keys(int client_socket)
 {
     uint64_t x = rand() % 1000;
 
-    uint64_t X = calc_mod(g, x, n);
+    uint64_t X = pow_mod(g, x, n);
 
     send(client_socket, &X, sizeof(X), 0);
 
@@ -47,11 +57,16 @@ void exchange_keys(int client_socket)
     recv(client_socket, &Y, sizeof(Y), 0);
 
     // NICE
-    uint64_t secret = calc_mod(Y, X, n);
+    uint64_t secret = pow_mod(Y, X, n);
 
     cout << "The secret is : " << secret << endl;
 }
 
+/*
+    @params -> client_socket
+    @return -> void
+    @description -> serves the requests of the clients
+*/
 void get_served(int client_socket)
 {
     char paul_message[2048];

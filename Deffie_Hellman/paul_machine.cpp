@@ -16,7 +16,11 @@ using namespace std;
 
 const int PORT = 5400;
 
-uint64_t calc_mod(uint64_t base, uint64_t power, uint64_t mod)
+/*
+    @params -> base, power, modulo
+    @return -> (base ^ power) % modulo
+*/
+uint64_t pow_mod(uint64_t base, uint64_t power, uint64_t mod)
 {
     if (power == 0)
         return 1;
@@ -26,7 +30,7 @@ uint64_t calc_mod(uint64_t base, uint64_t power, uint64_t mod)
 
     int mid = (power / 2);
 
-    int res = calc_mod(base, mid, mod);
+    int res = pow_mod(base, mid, mod);
 
     res = (res * res) % mod;
 
@@ -36,11 +40,16 @@ uint64_t calc_mod(uint64_t base, uint64_t power, uint64_t mod)
     return (res);
 }
 
+/*
+    @params -> client_socket
+    @return -> void
+    @description -> different users share their intermediate secret with each other(X and Y in our case)
+*/
 void exchange_keys(int client_socket)
 {
     uint64_t y = rand() % 1000;
 
-    uint64_t Y = calc_mod(g, y, n);
+    uint64_t Y = pow_mod(g, y, n);
 
     uint64_t X = -1;
 
@@ -48,11 +57,16 @@ void exchange_keys(int client_socket)
     // send Y
     send(client_socket, &Y, sizeof(Y), 0);
 
-    uint64_t secret = calc_mod(X, Y, n);
+    uint64_t secret = pow_mod(X, Y, n);
 
     cout << "The secret is : " << secret << endl;
 }
 
+/*
+    @params -> client_socket
+    @return -> void
+    @description -> serves the requests of the clients
+*/
 void serve_client(int client_socket)
 {
     char server_response[] = "Hello bob";
@@ -68,6 +82,9 @@ void serve_client(int client_socket)
     exchange_keys(client_socket);
 }
 
+/*
+    Driver code
+*/
 int main()
 {
 
