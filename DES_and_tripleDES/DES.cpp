@@ -124,13 +124,20 @@ int s_box_perm[8][4][16] = {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 
                              7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8,
                              2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}};
 
-// Fix the bug in this function
+/*
+
+    @params -> input string
+    @return -> string after applying s-box permutation on it
+    @Description -> It takes a 48 bit number, apply S-box perm and return a 32 bit output string
+
+*/
 string apply_s_box_perm(string input)
 {
 
     string output = "";
 
-    for (int i_group = 0; i_group < 8; i_group++)
+    int n_groups = 8; // make 8 groups of 6 bits each
+    for (int i_group = 0; i_group < n_groups; i_group++)
     {
         string cur_group_op = "";
         int start_idx = i_group * 6;
@@ -150,19 +157,11 @@ string apply_s_box_perm(string input)
     return output;
 }
 
-string apply_perm(int *arr, string input, size_t output_len)
-{
-    string output;
-
-    output.resize(output_len);
-
-    for (size_t i = 0; i < output_len; i++)
-    {
-        output[i] = input[arr[i] - 1];
-    }
-
-    return output;
-}
+/*
+    @params -> permutation table(arr), input string, length of the output string
+    @return -> output string 
+    @Description -> output_string = permutation_table(input_string)
+*/
 
 int initial_perm[64] = {58, 50, 42, 34, 26, 18, 10, 2,
                         60, 52, 44, 36, 28, 20, 12, 4,
@@ -200,13 +199,20 @@ int final_perm[64] = {40, 8, 48, 16, 56, 24, 64, 32,
                       35, 3, 43, 11, 51, 19, 59, 27,
                       34, 2, 42, 10, 50, 18, 58, 26,
                       33, 1, 41, 9, 49, 17, 57, 25};
+string apply_perm(int *arr, string input, size_t output_len)
+{
+    string output;
 
-/*********************************************
- * 
- * CODE FOR PREPARING KEYS (K1 -> K16)
- * 
- * 
- * ********************************************/
+    output.resize(output_len);
+
+    for (size_t i = 0; i < output_len; i++)
+    {
+        output[i] = input[arr[i] - 1];
+    }
+
+    return output;
+}
+
 int l_shift_table[16] = {1, 1, 2, 2,
                          2, 2, 2, 2,
                          1, 2, 2, 2,
@@ -225,18 +231,27 @@ string L_shift(string input, int num_steps)
     return input;
 }
 
+/*********************************************
+ * 
+ * @params -> 64 bit key
+ * @return -> list of 16 keys(K1 -> k16) to be used for each round
+ * 
+ * ********************************************/
 vector<string> prepare_compressed_keys(const string &key)
 {
     // apply pc1
     vector<string> compressed_keys(16);
 
+    /* Convert 64 bit key to 56 bit key */
     string key_final = apply_perm(pc1, key, 56);
 
-    string l_key = key_final.substr(0, 28);
+    string l_key = key_final.substr(0, 28); // left half
 
-    string r_key = key_final.substr(28, 28);
+    string r_key = key_final.substr(28, 28); // right half
 
-    for (int i_round = 0; i_round < 16; i_round++)
+    int n_rounds = 16;
+
+    for (int i_round = 0; i_round < n_rounds; i_round++)
     {
         l_key = L_shift(l_key, l_shift_table[i_round]);
         r_key = L_shift(r_key, l_shift_table[i_round]);
@@ -251,14 +266,17 @@ vector<string> prepare_compressed_keys(const string &key)
 
 // keys will be same for each block
 /*
-    CODE FOR ENCRYPTION
+    @params -> data_block_initial(64 bits of data in binary string form), list of keys
+    @return -> encrypted data_bts
+    @Description -> The 64 bit data block passes through 16 rounds of DES and encrypted block is returned
 */
-string encrypt_block(bitset<64> data_bts, vector<string> compressed_keys)
+string encrypt_block(const string &data_block_initial, vector<string> compressed_keys)
 {
     // bitset<64> data_bts(data);
     // apply initial perm on data
-    string data_block = apply_perm(initial_perm, data_bts.to_string(), 64);
+    string data_block = apply_perm(initial_perm, data_block_initial, 64);
 
+    // divide data into two halves : l_half, r_half
     string l_data = data_block.substr(0, 32);
     string r_data = data_block.substr(32, 32);
 
@@ -289,7 +307,7 @@ string encrypt_block(bitset<64> data_bts, vector<string> compressed_keys)
         {
             l_data = r_data_p_box;
         }
-        // cout << "Round " << (i_round + 1) << " " << bin_to_hex(l_data) << " " << bin_to_hex(r_data) << " " << bin_to_hex(compressed_key) << endl;
+        cout << "Round " << (i_round + 1) << " " << bin_to_hex(l_data) << " " << bin_to_hex(r_data) << " " << bin_to_hex(compressed_key) << endl;
     }
 
     // apply final permute
@@ -298,6 +316,11 @@ string encrypt_block(bitset<64> data_bts, vector<string> compressed_keys)
     return bin_to_hex(cipher_block);
 }
 
+/*
+    @params -> data(input string), key_bin(key in binary string form), mode(mode of operation (encrypt/decrypt))
+    @return -> ecrypted data
+    @Description -> takes the input string, encrypts it block by block and returns the cipher text
+*/
 string encrypt(string data, const string &key_bin, int mode = MOD_ENCRYPT)
 {
     vector<string> compressed_keys = prepare_compressed_keys(key_bin);
@@ -321,7 +344,7 @@ string encrypt(string data, const string &key_bin, int mode = MOD_ENCRYPT)
 
         string cur_block = data_bin.substr(starting_idx, size_block * 4);
 
-        string res = encrypt_block(bitset<64>(cur_block), compressed_keys);
+        string res = encrypt_block(cur_block, compressed_keys);
 
         cipher_text += res;
     }
@@ -329,15 +352,16 @@ string encrypt(string data, const string &key_bin, int mode = MOD_ENCRYPT)
     return cipher_text;
 }
 
+/*
+    @params     : data(input cipher text), key_bin(key in binary string format)
+    @return     : original plain text
+    @Description: decrypts the original cipher text block by block
+*/
 string decrypt(const string &data, const string &key_bin)
 {
     return encrypt(data, key_bin, MOD_DECRYPT);
 }
 ///////////////////////////////////////////////////////////////////////////////
-/*
-TRIPLE DES ==> EK3(Dk2(Ek1(plaintext)))
-decryption ==> Dk1(Ek2(Dk3(plaintext)))
-*/
 
 void DES_Algo(const string &data)
 {
@@ -358,6 +382,10 @@ void DES_Algo(const string &data)
     cout << "......................................................................." << endl;
 }
 
+/*
+TRIPLE DES ==> EK3(Dk2(Ek1(plaintext)))
+decryption ==> Dk1(Ek2(Dk3(plaintext)))
+*/
 void Triple_DES_Algo(const string &data)
 {
 
