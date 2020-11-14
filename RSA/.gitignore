@@ -3,7 +3,6 @@ RSA
 *power_func_test.cpp
 *test
 *extended_euclid_algo.cpp
-./RSA
+*RSA
 *.o
-*/.out
-.gitignore
+*.out
