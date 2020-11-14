@@ -1,4 +1,9 @@
 */.out
 RSA
-power_func_test.cpp
-test
+*power_func_test.cpp
+*test
+*extended_euclid_algo.cpp
+./RSA
+*.o
+*/.out
+.gitignore
