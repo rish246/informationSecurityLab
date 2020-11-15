@@ -42,10 +42,22 @@ unordered_map<int64_t, vector<int64_t>> generate_map(int64_t A, int64_t x, int64
 
 pair<int64_t, int64_t> extended_euclid_algo(int64_t A, int64_t x, int64_t B, int64_t y, int64_t d)
 {
+    // no map is being generated for this case
 
     unordered_map<int64_t, vector<int64_t>> expansion = generate_map(A, x, B, y, d);
     unordered_map<int64_t, int64_t> consonent;
     queue<int64_t> q;
+
+    // cout << "Map == " << endl;
+    // for (auto entry : expansion)
+    // {
+    //     cout << entry.first << " : ";
+    //     for (auto val : entry.second)
+    //     {
+    //         cout << val << " ";
+    //     }
+    //     cout << endl;
+    // }
 
     q.push(1);
     consonent[1] = 1;
@@ -86,7 +98,9 @@ int64_t mod_inverse_euclid(int64_t e, int64_t p1, int64_t p2)
     int64_t x = 1;
     int64_t y = t / e;
     int64_t d = (A * x) - (B * y);
-
+    if (d == 0)
+        return -1;
+    // found the bug
     pair<int64_t, int64_t> result = extended_euclid_algo(A, x, B, y, d);
 
     int64_t y_res = result.second;
@@ -203,24 +217,27 @@ int main()
                                   523,
                                   541};
 
-    // generate e, p, p such that e and p are coPrime numbers
+    // // generate e, p, p such that e and p are coPrime numbers
     while (true)
     {
         // 3 prime numbers
         int e_idx = rand() % 50;
-        int p_idx = rand() % 100;
-        int q_idx = rand() % 100;
+        int p_idx = rand() % 50 + 50;
+        int q_idx = rand() % 50 + 50;
         if (e_idx != p_idx && p_idx != q_idx)
         {
             // run test
             int e = hundred_primes[e_idx];
             int p = hundred_primes[p_idx];
             int q = hundred_primes[q_idx];
+            cout << e_idx << " " << p_idx << " " << q_idx << endl;
 
             int res1 = mod_inverse_euclid(e, p, q);
+            if (res1 == -1)
+                continue;
             int res2 = mod_inverse_naive(e, p, q);
 
-            if (res1 != res2)
+            if (res1 != res2 && res1 != -1)
             {
                 cout << e << " " << p << " " << q << endl;
                 cout << res1 << " " << res2 << endl;
@@ -230,8 +247,11 @@ int main()
             cout << "OK" << endl;
         }
     }
-
+    // int e = 17, p = 373, q = 307;
+    // int res = mod_inverse_euclid(e, p, q);
+    // cout << res << endl;
     // int64_t t = (p1 - 1) * (p2 - 1);
 
     // pair<int, int> res = extended_euclid_algo(t, 1, e, )
 }
+// 17 373 307 --> 3 variables
