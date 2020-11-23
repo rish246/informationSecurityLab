@@ -88,13 +88,11 @@ int main()
     CaearCipher caesarCipher(SHIFT);
 
     string encryptedText = caesarCipher.encryptText(message);
+    cout << "Original Message = " << message << endl << endl;
 
-    cout << "Encrypted Message = " << endl;
-    cout << encryptedText << endl;
+    cout << "Encrypted Message = " << encryptedText << endl << endl;
 
 
-    cout << "................." << endl;
     string originalMessage = caesarCipher.decryptText(encryptedText);
-    cout << "Original message was = " << endl;
-    cout << originalMessage << endl;
+    cout << "Decrypted Message = " << originalMessage << endl << endl;
 }

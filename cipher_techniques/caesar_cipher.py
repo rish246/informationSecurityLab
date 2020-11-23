@@ -8,22 +8,6 @@ class CaesarCipher:
     
     # def is_capital(letter):
 
-    def map_to_range(self, message):
-        """
-        Map a char string to characters having ascii (0, 25)
-        """
-        mapped_message = []
-        for letter in message:
-            if letter != ' ':
-                map_value = ord(letter) - ord('a')
-                # print(map_value)
-                print(chr(map_value))
-                mapped_message.append(chr(map_value))
-            else:
-                mapped_message.append(letter)
-        
-        return ''.join(mapped_message)
-
 
 
     def encrypt(self, message):
@@ -33,35 +17,38 @@ class CaesarCipher:
         => caesar cipher : 
             in caesar cipher, a letter in a message is replaced with a SHIFT places next to it.
         """
-        mapped_message = self.map_to_range(message)
 
         encrypted_message = []
 
-        for letter in mapped_message:
-            if letter != " ":
-                final_location = (ord(letter) + self.SHIFT) % 26
-                encrypted_letter = chr(final_location)
-                encrypted_message.append(encrypted_letter)
-            else:
-                encrypted_message.append(letter)
+        # 80 -> 100
+        # t -> 19
+        # 179 -> 19
+        # 
+        for letter in message:
+            final_letter_location = (ord(letter) + self.SHIFT) % ord('z')
 
+            # if final_letter_location < ord('a') final_letter_location += ord('a')
+            if(final_letter_location < ord('a')):
+                final_letter_location += ord('a')
+            encrypted_letter = chr(final_letter_location)
+            encrypted_message.append(encrypted_letter)
+        
         return ''.join(encrypted_message)
 
 
+    # 80 -> 100
+    # 78
+    # 78 < 80 ? 98 : 78
     def decrypt(self, encoded_message):
-        mapped_message = self.map_to_range(encoded_message)
 
         original_message = []
 
-        for letter in mapped_message:
-            if letter != " ":
-                final_position = ord(letter) - self.SHIFT
-                if final_position < 0:
-                    final_position += 26
-
-                original_message.append(chr(final_position))
-            else:
-                original_message.append(letter)
+        for letter in encoded_message:
+            original_letter_location = (ord(letter) - self.SHIFT)
+            print(f'{letter} : {original_letter_location}')
+            if original_letter_location < ord('a'):
+                original_letter_location += 25
+            original_message.append(chr(original_letter_location))
 
         return "".join(original_message)
                 
@@ -73,7 +60,7 @@ class CaesarCipher:
 
 
 def main():
-    message = "this is a message"
+    message = "attackatthedawn"
 
     SHIFT = 4
     caesar_cipher = CaesarCipher(SHIFT)
@@ -81,7 +68,10 @@ def main():
     encrypted_text = caesar_cipher.encrypt(message)
     print(encrypted_text)
 
+
     original_message = caesar_cipher.decrypt(encrypted_text)
     print(original_message)
 
 main()
+
+# w --> {

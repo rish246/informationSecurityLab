@@ -230,7 +230,7 @@ vector<int64_t> decrypt(vector<int64_t> cipher_blocks, int64_t p, int64_t q)
     return original_blocks;
 }
 
-void print_vector(vector<int64_t> v, string message)
+void print_vector(vector<int64_t> v, const string &message)
 {
     cout << "-------------------------------------------------------------------------------------------------------" << endl;
     cout << setw(60) << message << endl;

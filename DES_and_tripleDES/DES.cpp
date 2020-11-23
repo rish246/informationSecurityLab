@@ -307,7 +307,7 @@ string encrypt_block(const string &data_block_initial, vector<string> compressed
         {
             l_data = r_data_p_box;
         }
-        cout << "Round " << (i_round + 1) << " " << bin_to_hex(l_data) << " " << bin_to_hex(r_data) << " " << bin_to_hex(compressed_key) << endl;
+        // cout << "Round " << (i_round + 1) << " " << bin_to_hex(l_data) << " " << bin_to_hex(r_data) << " " << bin_to_hex(compressed_key) << endl;
     }
 
     // apply final permute
@@ -366,9 +366,8 @@ string decrypt(const string &data, const string &key_bin)
 void DES_Algo(const string &data)
 {
     cout << "......................................................................." << endl;
-    cout << "<<<<<<<<<<<<<<<<<<<<   TRIPLE DES ALGORITHM  >>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+    cout << "<<<<<<<<<<<<<<<<<<<< DES ALGORITHM  >>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
 
-    // string data = "123456ABCD132536";
     string key1 = "AABB09182736CCDD";
     string key1_bin = hex_to_bin(key1);
 
@@ -415,7 +414,7 @@ int main()
 
     cout << "Original Data  : " << data << endl;
 
-    DES_Algo(data);
+    // DES_Algo(data);
 
     Triple_DES_Algo(data);
 }

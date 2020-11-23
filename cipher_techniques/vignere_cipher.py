@@ -21,8 +21,6 @@ def encrypt(plain_text, key):
     # get keystream from the key
     key_stream = get_keystream(plain_text, key)
 
-    print(key_stream)
-
 
     vigenere_mat = []
 
@@ -40,25 +38,24 @@ def encrypt(plain_text, key):
             next_row.append(number)
         vigenere_mat.append(next_row)
 
-    # print(vigenere_mat)
+
     encrypted_text = []
     
     for i in range(len(plain_text)):
         encrypted_char = vigenere_mat[ord(key_stream[i]) - ord('a')][ord(plain_text[i]) - ord('a')]
         encrypted_text.append(chr(encrypted_char + ord('a')))
 
-    print("".join(encrypted_text))
 
-
-    return plain_text
+    return ''.join(encrypted_text)
 
 
 
 def main():
     plain_text = "attackatthedawn"
     key = "lemon"
-
+    print(f'PlainText = {plain_text}')
+    print(f'Key = {key}')
     cipher_text = encrypt(plain_text, key)
-    print(cipher_text)
+    print(f'CipherText = {cipher_text}')
 
 main()

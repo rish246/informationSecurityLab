@@ -144,16 +144,17 @@ def main():
     key = np.array([[2, 3], [3, 6]])
 
     hill_cipher = HillCipher(key)
-
     plain_text = "plants"
+
+    print(f'Orignal Message : {plain_text}')
 
     encrypted_text = hill_cipher.encrypt(plain_text)
 
-    print(encrypted_text)
+    print(f'Encrypted Message : {encrypted_text}')
 
     original_text = hill_cipher.decrypt(encrypted_text)
 
-    print(original_text)
+    print(f'Decrypted Message : {original_text}')
 
 
 main()
