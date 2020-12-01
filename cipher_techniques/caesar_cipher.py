@@ -45,9 +45,8 @@ class CaesarCipher:
 
         for letter in encoded_message:
             original_letter_location = (ord(letter) - self.SHIFT)
-            print(f'{letter} : {original_letter_location}')
             if original_letter_location < ord('a'):
-                original_letter_location += 25
+                original_letter_location += 25      
             original_message.append(chr(original_letter_location))
 
         return "".join(original_message)
@@ -60,17 +59,18 @@ class CaesarCipher:
 
 
 def main():
-    message = "attackatthedawn"
+    plain_text = "attackatthedawn"
 
     SHIFT = 4
     caesar_cipher = CaesarCipher(SHIFT)
 
-    encrypted_text = caesar_cipher.encrypt(message)
-    print(encrypted_text)
+    print(f'Original Message : {plain_text}')
+    cipher_text = caesar_cipher.encrypt(plain_text)
+    print(f'Encrypted Message : {cipher_text}')
 
 
-    original_message = caesar_cipher.decrypt(encrypted_text)
-    print(original_message)
+    original_message = caesar_cipher.decrypt(cipher_text)
+    print(f'Decrypted Message : {original_message}')
 
 main()
 

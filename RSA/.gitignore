@@ -6,3 +6,4 @@ extended_euclid_algo.cpp
 *RSA
 *.o
 *.out
+*.py
